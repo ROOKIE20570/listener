@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"log"
 	"time"
@@ -18,7 +19,7 @@ var (
 )
 
 func main() {
-	// Open device
+	//Open device
 	handle, err := pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
 	if err != nil {
 		log.Fatal(err)
@@ -29,6 +30,11 @@ func main() {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
 		// Process packet here
-		fmt.Println(packet)
+		tcpLayer := packet.Layer(layers.LayerTypeTCP)
+		if tcpLayer != nil{
+			_, some := tcpLayer.(*layers.TCP)
+			fmt.Println(some)
+		}
 	}
+
 }
