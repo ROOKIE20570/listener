@@ -1,12 +1,15 @@
 package main
 
+import "flag"
+
 var (
 	port int
-	name string
+	device string
 )
 
 func main() {
-
+	flag.IntVar(&port,"p",0,"port number")
+	flag.StringVar(&device,"d","","device name")
 	////Open device
 	//handle, err := pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
 	//if err != nil {
