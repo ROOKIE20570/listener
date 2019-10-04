@@ -12,7 +12,7 @@ func run(device string, port int){
 	case "redis":
 		parse = new(parser.Redis)
 	default:
-		log.Fatal("暂不支持的设备")
+		log.Fatal("not supported")
 	}
 
 	handle.setBPFFilter(parse.getFilter())
