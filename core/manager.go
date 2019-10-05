@@ -7,8 +7,11 @@ import (
 )
 func run(device string, port int){
 
-	handle, err := pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
-	var parse *parser.Parser
+	handle, err := pcap.OpenLive(device, 65535, false, 0)
+	if err != nil{
+		log.Fatal("open listener fail")
+	}
+	var parse parser.Parser
 	switch device {
 	case "mysql":
 		parse = new(parser.Mysql)
@@ -18,5 +21,6 @@ func run(device string, port int){
 		log.Fatal("not supported")
 	}
 
-	handle.setBPFFilter(parse.getFilter())
+	handle.SetBPFFilter(parse.GetFilter(port))
+
 }

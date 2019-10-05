@@ -5,10 +5,10 @@ import "strconv"
 type Mysql struct {
 }
 
-func (mysql *Mysql) resolve(stream []byte) (string, error) {
+func (mysql *Mysql) Resolve(stream []byte) (string, error) {
 	return "", nil
 }
 
-func (mysql *Mysql) getFilter(port int) string {
+func (mysql *Mysql) GetFilter(port int) string {
 	return "tcp and port " + strconv.Itoa(port)
 }

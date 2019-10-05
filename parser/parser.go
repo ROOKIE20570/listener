@@ -2,6 +2,6 @@ package parser
 
 type Parser interface {
 	 //对应每个parser不同的过滤行为
-	resolve (stream []byte) (string, error)//解析函数
-	getFilter(port int) string
+	Resolve (stream []byte) (string, error)//解析函数
+	GetFilter(port int) string
 }
