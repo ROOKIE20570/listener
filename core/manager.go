@@ -5,7 +5,7 @@ import (
 	"listener/parser"
 	"log"
 )
-func run(device string, port int){
+func Run(device string, port int){
 
 	handle, err := pcap.OpenLive(device, 65535, false, 0)
 	if err != nil{
