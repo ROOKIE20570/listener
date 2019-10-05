@@ -6,7 +6,7 @@ type Redis struct {
 }
 
 func (redis *Redis) Resolve(stream []byte) (string, error) {
-
+	return "",nil
 }
 
 func (redis *Redis) GetFilter(port int) string {

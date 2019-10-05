@@ -22,5 +22,4 @@ func run(device string, port int){
 	}
 
 	handle.SetBPFFilter(parse.GetFilter(port))
-
 }
