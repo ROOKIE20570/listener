@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"listener/parser"
 	"log"
@@ -22,4 +24,9 @@ func Run(device string, port int){
 	}
 
 	handle.SetBPFFilter(parse.GetFilter(port))
+
+	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+	for packet:=range packetSource.Packets(){
+		fmt.Println(packet)
+	}
 }
