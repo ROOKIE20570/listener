@@ -1,20 +1,21 @@
 package core
 
 import (
-	"fmt"
 	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"listener/parser"
 	"log"
 )
-func Run(device string, port int){
 
-	handle, err := pcap.OpenLive(device, 65535, false, 0)
-	if err != nil{
-		log.Fatal("open listener fail")
+func Run(device, listener string, port int) {
+
+	handle, err := pcap.OpenLive(device, 65535, false, pcap.BlockForever)
+	if err != nil {
+		log.Fatal("open listener fail", err)
 	}
 	var parse parser.Parser
-	switch device {
+	switch listener {
 	case "mysql":
 		parse = new(parser.Mysql)
 	case "redis":
@@ -22,11 +23,14 @@ func Run(device string, port int){
 	default:
 		log.Fatal("not supported")
 	}
-
+	log.Println(parse.GetFilter(port))
 	handle.SetBPFFilter(parse.GetFilter(port))
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-	for packet:=range packetSource.Packets(){
-		fmt.Println(packet)
+	for packet := range packetSource.Packets() {
+		tcpLayer := packet.Layer(layers.LayerTypeTCP)
+		if tcpLayer != nil {
+			tcp, _ := tcpLayer.(*layers.TCP)
+		}
 	}
 }
