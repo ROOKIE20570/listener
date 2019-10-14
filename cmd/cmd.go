@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"listener/core"
-	"log"
 )
 
 const version = "0.0.0"
@@ -20,7 +19,6 @@ func main() {
 	flag.StringVar(&listener, "l", "", "listener name")
 
 	flag.Parse()
-	log.Println(device,listener,port)
 	core.Run(device, listener, port)
 
 }
