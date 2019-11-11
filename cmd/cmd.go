@@ -14,6 +14,7 @@ var (
 )
 
 func main() {
+	//todo 参数校验 提示
 	flag.IntVar(&port, "p", 0, "port number")
 	flag.StringVar(&device, "d", "", "device name")
 	flag.StringVar(&listener, "l", "", "listener name")
@@ -22,3 +23,5 @@ func main() {
 	core.Run(device, listener, port)
 
 }
+
+
