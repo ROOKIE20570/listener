@@ -1,11 +1,14 @@
 package parser
 
-import "strconv"
+import (
+	"io"
+	"strconv"
+)
 
 type Mysql struct {
 }
 
-func (mysql *Mysql) Resolve(stream []byte) (string, error) {
+func (mysql *Mysql) Resolve(r io.Reader) (string, error) {
 	return "", nil
 }
 

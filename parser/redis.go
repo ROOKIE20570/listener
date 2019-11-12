@@ -1,11 +1,14 @@
 package parser
 
-import "strconv"
+import (
+	"io"
+	"strconv"
+)
 
 type Redis struct {
 }
 
-func (redis *Redis) Resolve(stream []byte) (string, error) {
+func (redis *Redis) Resolve(r io.Reader) (string, error) {
 	return "", nil
 }
 
