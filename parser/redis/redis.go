@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"github.com/google/gopacket"
 	"io"
 	"strconv"
 )
@@ -8,7 +9,7 @@ import (
 type Redis struct {
 }
 
-func (redis *Redis) Resolve(r io.Reader) (string, error) {
+func (redis *Redis) Resolve(net gopacket.Flow, transport gopacket.Flow, r io.Reader) (string, error) {
 	return "", nil
 }
 

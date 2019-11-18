@@ -37,8 +37,11 @@ func Run(device, listener string, port int) {
 		log.Fatal("not supported")
 	}
 
-	handle.SetBPFFilter(parse.GetFilter(port))
-
+	err = handle.SetBPFFilter(parse.GetFilter(port))
+	if err != nil {
+		log.Println("set filter fail")
+		panic(err)
+	}
 	streamFactory := &pluginStreamFactory{}
 	streamPool := tcpassembly.NewStreamPool(streamFactory)
 	assembler := tcpassembly.NewAssembler(streamPool)
@@ -50,11 +53,17 @@ func Run(device, listener string, port int) {
 	for {
 		select {
 		case packet := <-packets:
+			if packet == nil {
+				return
+			}
+
 			if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
+				//Unusable packet
 				continue
 			}
-			tcpLayer := packet.TransportLayer().(*layers.TCP)
-			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcpLayer, packet.Metadata().Timestamp)
+
+			tcp := packet.TransportLayer().(*layers.TCP)
+			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
 
 		case <-flushTicker:
 			assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
@@ -68,8 +77,9 @@ func (pluginStreamFactory *pluginStreamFactory) New(net, transport gopacket.Flow
 		transport: transport,
 		r:         tcpreader.NewReaderStream(),
 	}
+
+	go parse.Resolve(net, transport, &(pluginStream.r))
 	// Important... we must guarantee that data from the reader stream is read.
-	go parse.Resolve(&(pluginStream.r))
 	// ReaderStream implements tcpassembly.Stream, so we can return a pointer to it.
 	return &pluginStream.r
 }
