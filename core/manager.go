@@ -7,6 +7,8 @@ import (
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
 	"listener/parser"
+	"listener/parser/mysql"
+	"listener/parser/redis"
 	"log"
 	"time"
 )
@@ -28,12 +30,13 @@ func Run(device, listener string, port int) {
 	}
 	switch listener {
 	case "mysql":
-		parse = new(parser.Mysql)
+		parse = new(mysql.Mysql)
 	case "redis":
-		parse = new(parser.Redis)
+		parse = new(redis.Redis)
 	default:
 		log.Fatal("not supported")
 	}
+
 	handle.SetBPFFilter(parse.GetFilter(port))
 
 	streamFactory := &pluginStreamFactory{}
@@ -65,8 +68,8 @@ func (pluginStreamFactory *pluginStreamFactory) New(net, transport gopacket.Flow
 		transport: transport,
 		r:         tcpreader.NewReaderStream(),
 	}
-	go // Important... we must guarantee that data from the reader stream is read.
-
+	// Important... we must guarantee that data from the reader stream is read.
+	go parse.Resolve(&(pluginStream.r))
 	// ReaderStream implements tcpassembly.Stream, so we can return a pointer to it.
 	return &pluginStream.r
 }

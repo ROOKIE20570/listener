@@ -1,4 +1,4 @@
-package parser
+package mysql
 
 import (
 	"io"
@@ -9,6 +9,7 @@ type Mysql struct {
 }
 
 func (mysql *Mysql) Resolve(r io.Reader) (string, error) {
+
 	return "", nil
 }
 
