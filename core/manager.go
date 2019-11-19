@@ -6,6 +6,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
+	"listener/config"
 	"listener/parser"
 	"listener/parser/mysql"
 	"listener/parser/redis"
@@ -22,13 +23,13 @@ type pluginStream struct {
 
 var parse parser.Parser
 
-func Run(device, listener string, port int) {
+func Run() {
 
-	handle, err := pcap.OpenLive(device, 65535, false, pcap.BlockForever)
+	handle, err := pcap.OpenLive(config.Conf.Device, 65535, false, pcap.BlockForever)
 	if err != nil {
 		log.Fatal("open listener fail", err)
 	}
-	switch listener {
+	switch config.Conf.Type {
 	case "mysql":
 		parse = new(mysql.Mysql)
 	case "redis":
@@ -37,7 +38,7 @@ func Run(device, listener string, port int) {
 		log.Fatal("not supported")
 	}
 
-	err = handle.SetBPFFilter(parse.GetFilter(port))
+	err = handle.SetBPFFilter(parse.GetFilter(config.Conf.Port))
 	if err != nil {
 		log.Println("set filter fail")
 		panic(err)
@@ -47,7 +48,7 @@ func Run(device, listener string, port int) {
 	assembler := tcpassembly.NewAssembler(streamPool)
 
 	flushTicker := time.Tick(1 * time.Minute)
-	log.Printf("listening device %s,port %d, type %s", device, port, listener)
+	log.Printf("listening device %s,port %d, type %s", config.Conf.Device, config.Conf.Port, config.Conf.Type)
 	packets := gopacket.NewPacketSource(handle, handle.LinkType()).Packets()
 
 	for {

@@ -16,12 +16,7 @@ const (
 	FROM_SERVER_DIRECTION = 1
 )
 
-type packet struct {
-	len     int
-	seq     int
-	payload bytes.Buffer
-	from    int8
-}
+
 
 func (mysql *Mysql) Resolve(net gopacket.Flow, transport gopacket.Flow, r io.Reader) (string, error) {
 	var packets = make(chan *packet, 50)
@@ -29,7 +24,9 @@ func (mysql *Mysql) Resolve(net gopacket.Flow, transport gopacket.Flow, r io.Rea
 		for {
 			select {
 			case packet := <-packets:
-				packet.resolve()
+				if packet != nil {
+					packet.resolve()
+				}
 			}
 		}
 	}()
@@ -46,6 +43,7 @@ func (mysql *Mysql) Resolve(net gopacket.Flow, transport gopacket.Flow, r io.Rea
 		}
 
 		length := int(uint32(header[0]) | uint32(header[1])<<8 | uint32(header[2])<<16)
+
 		seq = header[3]
 		if _, err := io.CopyN(&payload, r, int64(length)); err != nil {
 			panic(err)
@@ -57,7 +55,7 @@ func (mysql *Mysql) Resolve(net gopacket.Flow, transport gopacket.Flow, r io.Rea
 		} else {
 			from = FROM_CLIENT_DIRECTION
 		}
-		pk := &packet{payload.Len(), int(seq), payload, from}
+		pk := &packet{payload.Len(), int(seq), payload.Bytes(), from}
 		packets <- pk
 
 	}
@@ -68,6 +66,4 @@ func (mysql *Mysql) GetFilter(port int) string {
 	return "tcp and port " + strconv.Itoa(port)
 }
 
-func (pk *packet) resolve() {
-}
 
